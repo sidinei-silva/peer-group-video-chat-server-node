@@ -14,7 +14,7 @@ const peerServer = ExpressPeerServer(server, {
   debug: true
 });
 
-app.use('/', (request, response) => {
+app.get('/', (request, response) => {
   response.json({message: 'Hello'})
 })
 
