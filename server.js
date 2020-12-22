@@ -14,6 +14,10 @@ const peerServer = ExpressPeerServer(server, {
   debug: true
 });
 
+app.use('/', (request, response) => {
+  response.json({message: 'Hello'})
+})
+
 app.use('/peerjs', peerServer);
 
 io.on('connection', socket => {
