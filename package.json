@@ -1,0 +1,17 @@
+{
+  "name": "@group-chat-node-react/server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "author": "Sidinei Silva <sidinei.silva02@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
