@@ -28,6 +28,18 @@ io.on('connection', socket => {
     socket.on('message', ({name, message}) => {
       socket.to(roomId).broadcast.emit('create-message', {name, message})
     });
+
+    socket.on('hand-up', ({userId, isHandUp}) => {
+
+      if(isHandUp){
+        io.to(roomId).emit('create-message', {name: 'Sistema', message:`${name} - Levantou a mão`})
+      }else {
+        io.to(roomId).emit('create-message', {name: 'Sistema', message:`${name} - Abaixou a mão`})
+      }
+      
+      socket.to(roomId).broadcast.emit('toggle-hand-up', {userId: `${userId}`, isHandUp})
+    });
+
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
       io.to(roomId).emit('create-message', {name:'Sistema', message: `${name} - Saiu da sala`})
