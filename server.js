@@ -21,15 +21,16 @@ app.get('/', (request, response) => {
 app.use('/peerjs', peerServer);
 
 io.on('connection', socket => {
-  socket.on('join-room', (roomId, userId) => {
+  socket.on('join-room', (roomId, userId, name) => {
     socket.join(roomId)
     socket.to(roomId).broadcast.emit('user-connected', userId)
-    io.to(roomId).emit('create-message', 'Novo usuário conectado')
-    socket.on('message', (message) => {
-      socket.to(roomId).broadcast.emit('create-message', message)
+    io.to(roomId).emit('create-message', {name: 'Sistema', message:`${name} - Acabou de entrar`})
+    socket.on('message', ({name, message}) => {
+      socket.to(roomId).broadcast.emit('create-message', {name, message})
     });
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
+      io.to(roomId).emit('create-message', {name:'Sistema', message: `${name} - Saiu da sala`})
     })
   })
 })
