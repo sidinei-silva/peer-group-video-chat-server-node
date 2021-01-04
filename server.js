@@ -47,9 +47,20 @@ io.on('connection', socket => {
       socket.to(roomId).broadcast.emit('toggle-hand-up', {userId: `${userId}`, isHandUp})
     });
 
+    socket.on('mute', ({userId, isMute}) => {
+
+      if(isMute){
+        socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Desabilitou audio`})
+      }else {
+        socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Habilitou audio`})
+      }
+      
+      socket.to(roomId).broadcast.emit('toggle-mute', {userId: `${userId}`, isMute})
+    });
+
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
-      
+
       socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Saiu da sala`})
     })
   })
