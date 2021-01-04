@@ -23,26 +23,45 @@ app.use('/peerjs', peerServer);
 io.on('connection', socket => {
   socket.on('join-room', (roomId, userId, name) => {
     socket.join(roomId)
+    
     socket.to(roomId).broadcast.emit('user-connected', userId)
-    io.to(roomId).emit('create-message', {name: 'Sistema', message:`${name} - Acabou de entrar`})
+    
+    socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Acabou de entrar`})
+    
     socket.on('message', ({name, message}) => {
       socket.to(roomId).broadcast.emit('create-message', {name, message})
+    });
+
+    socket.on('notification', ({ notification}) => {
+      socket.to(roomId).broadcast.emit('create-notification', {notification})
     });
 
     socket.on('hand-up', ({userId, isHandUp}) => {
 
       if(isHandUp){
-        io.to(roomId).emit('create-message', {name: 'Sistema', message:`${name} - Levantou a mão`})
+        socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Levantou a mão`})
       }else {
-        io.to(roomId).emit('create-message', {name: 'Sistema', message:`${name} - Abaixou a mão`})
+        socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Abaixou a mão`})
       }
       
       socket.to(roomId).broadcast.emit('toggle-hand-up', {userId: `${userId}`, isHandUp})
     });
 
+    socket.on('mute', ({userId, isMute}) => {
+
+      if(isMute){
+        socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Desabilitou audio`})
+      }else {
+        socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Habilitou audio`})
+      }
+      
+      socket.to(roomId).broadcast.emit('toggle-mute', {userId: `${userId}`, isMute})
+    });
+
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
-      io.to(roomId).emit('create-message', {name:'Sistema', message: `${name} - Saiu da sala`})
+
+      socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Saiu da sala`})
     })
   })
 })
