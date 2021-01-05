@@ -58,6 +58,10 @@ io.on('connection', socket => {
       socket.to(roomId).broadcast.emit('toggle-mute', {userId: `${userId}`, isMute})
     });
 
+    socket.on('debug', ({ messageDebug, objectDebug}) => {
+      io.to(roomId).emit('create-debug', {messageDebug: `${name} - ${messageDebug}`, objectDebug})
+    });
+
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
 
