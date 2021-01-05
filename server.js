@@ -26,7 +26,7 @@ io.on('connection', socket => {
     
     socket.to(roomId).broadcast.emit('user-connected', userId)
     
-    socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Acabou de entrar`})
+    socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Entrou no chat`})
     
     socket.on('message', ({name, message}) => {
       socket.to(roomId).broadcast.emit('create-message', {name, message})
