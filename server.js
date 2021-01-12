@@ -30,9 +30,9 @@ io.on('connection', socket => {
     const checkRoom = rooms.find(room => room.id === roomId)
    
     if(!checkRoom){
-      rooms.push({id: roomId, users: [{id: userId, name}]})
+      rooms.push({id: roomId, users: [{id: userId, name, isMuted: false, isHandUp: false}]})
     }else{
-      checkRoom.users.push({id: userId, name})
+      checkRoom.users.push({id: userId, name, isMuted: false, isHandUp: false})
     }
 
     socket.to(roomId).broadcast.emit('user-connected', userId)
@@ -48,6 +48,9 @@ io.on('connection', socket => {
     });
 
     socket.on('hand-up', ({userId, isHandUp}) => {
+      const room = rooms.find(room => room.id === roomId)
+      const userIndex = room.users.findIndex(user => user.id === userId)
+      room.users[userIndex].isHandUp = isHandUp
 
       if(isHandUp){
         socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Levantou a mão`})
@@ -59,6 +62,10 @@ io.on('connection', socket => {
     });
 
     socket.on('mute', ({userId, isMute}) => {
+
+      const room = rooms.find(room => room.id === roomId)
+      const userIndex = room.users.findIndex(user => user.id === userId)
+      room.users[userIndex].isMuted = isMute
 
       if(isMute){
         socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Desabilitou audio`})
