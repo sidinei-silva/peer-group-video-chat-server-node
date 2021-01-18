@@ -97,6 +97,11 @@ io.on('connection', socket => {
     socket.on('user-start-transmitting', ()=> {
       socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Está transmitindo`})
     })
+
+    socket.on('user-stop-transmitting', ()=> {
+      socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Parou de transmitir`})
+      io.to(roomId).emit('remove-shared-screen', {userId})
+    })
   })
 })
 
