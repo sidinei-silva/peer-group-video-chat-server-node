@@ -93,6 +93,10 @@ io.on('connection', socket => {
       const userIndex = room.users.findIndex(user => user.id === userId)
       room.users.splice(userIndex, 1)
     })
+
+    socket.on('user-start-transmitting', ()=> {
+      socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Está transmitindo`})
+    })
   })
 })
 
