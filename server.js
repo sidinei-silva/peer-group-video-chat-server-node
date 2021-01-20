@@ -35,7 +35,7 @@ io.on('connection', socket => {
       checkRoom.users.push({id: userId, name, isMuted: false, isHandUp: false})
     }
 
-    socket.to(roomId).broadcast.emit('user-connected', userId)
+    socket.to(roomId).broadcast.emit('user-connected', {userId, userName: name} )
     
     socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Entrou no chat`})
     
