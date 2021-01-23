@@ -27,15 +27,7 @@ io.on('connection', socket => {
   socket.on('join-room', (roomId, userId, name) => {
     socket.join(roomId)
 
-    const checkRoom = rooms.find(room => room.id === roomId)
-   
-    if(!checkRoom){
-      rooms.push({id: roomId, users: [{id: userId, name, isMuted: false, isHandUp: false}]})
-    }else{
-      checkRoom.users.push({id: userId, name, isMuted: false, isHandUp: false})
-    }
-
-    socket.to(roomId).broadcast.emit('user-connected', userId)
+    socket.to(roomId).broadcast.emit('user-connected', {userId, userName: name} )
     
     socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Entrou no chat`})
     
@@ -48,10 +40,7 @@ io.on('connection', socket => {
     });
 
     socket.on('hand-up', ({userId, isHandUp}) => {
-      const room = rooms.find(room => room.id === roomId)
-      const userIndex = room.users.findIndex(user => user.id === userId)
-      room.users[userIndex].isHandUp = isHandUp
-
+      
       if(isHandUp){
         socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Levantou a mão`})
       }else {
@@ -62,10 +51,7 @@ io.on('connection', socket => {
     });
 
     socket.on('mute', ({userId, isMute}) => {
-
-      const room = rooms.find(room => room.id === roomId)
-      const userIndex = room.users.findIndex(user => user.id === userId)
-      room.users[userIndex].isMuted = isMute
+      
 
       if(isMute){
         socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Desabilitou audio`})
@@ -76,22 +62,21 @@ io.on('connection', socket => {
       socket.to(roomId).broadcast.emit('toggle-mute', {userId: `${userId}`, isMute})
     });
 
-    socket.on('get-users', ({}) => {
-      const checkRoom = rooms.find(room => room.id === roomId)
-      if(checkRoom){
-
-        io.to(roomId).emit('users-in-room', {users: checkRoom.users  })
-      }
-
-    })
+    
 
     socket.on('disconnect', () => {
       socket.to(roomId).broadcast.emit('user-disconnected', userId)
       socket.to(roomId).broadcast.emit('create-notification', { notification:`${name} - Saiu da sala`})
       
-      const room = rooms.find(room => room.id === roomId)
-      const userIndex = room.users.findIndex(user => user.id === userId)
-      room.users.splice(userIndex, 1)
+    })
+
+    socket.on('user-start-transmitting', ()=> {
+      socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Está transmitindo`})
+    })
+
+    socket.on('user-stop-transmitting', ()=> {
+      socket.to(roomId).broadcast.emit('create-notification', {notification:`${name} - Parou de transmitir`})
+      io.to(roomId).emit('remove-shared-screen', {userId})
     })
   })
 })
