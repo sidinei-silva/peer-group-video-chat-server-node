@@ -62,6 +62,11 @@ io.on('connection', socket => {
       socket.to(roomId).broadcast.emit('toggle-mute', {userId: `${userId}`, isMute})
     });
 
+
+    socket.on('disable-cam', ({userId, isDisableCam}) => {      
+      socket.to(roomId).broadcast.emit('toggle-cam', {userId: `${userId}`, isDisableCam})
+    });
+
     
 
     socket.on('disconnect', () => {
